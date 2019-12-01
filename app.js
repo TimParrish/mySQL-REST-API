@@ -1,6 +1,9 @@
 const expressInstance = require("express");
 const serverApplication = expressInstance();
 const mysql = require("mysql");
+const cors = require('cors');
+
+serverApplication.use(cors());
 
 serverApplication.get("/", (req, res) => {
   console.log("Hit the root route");
