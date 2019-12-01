@@ -1,0 +1,31 @@
+{
+  "name": "mysql-rest-api",
+  "version": "1.0.0",
+  "description": "Simple RESTful API for mySQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimParrish/mySQL-REST-API.git"
+  },
+  "keywords": [
+    "mySQL",
+    "RESTful",
+    "API",
+    "JSON",
+    "response",
+    "simple",
+    "API"
+  ],
+  "author": "Tim Parrish",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/TimParrish/mySQL-REST-API/issues"
+  },
+  "homepage": "https://github.com/TimParrish/mySQL-REST-API#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
