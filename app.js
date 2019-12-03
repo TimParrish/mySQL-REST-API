@@ -1,7 +1,7 @@
 const expressInstance = require("express");
 const serverApplication = expressInstance();
 const mysql = require("mysql");
-const cors = require('cors');
+const cors = require("cors");
 
 serverApplication.use(cors());
 
@@ -26,16 +26,27 @@ serverApplication.get("/test", (req, res) => {
   databaseConnection.query(testQuery, (err, rows, fields) => {
     console.log("test retrieved???");
     res.json(rows);
-	if (err){
-		console.log("database error: " + err);
-		res.sendStatus(500);
-	};
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
   });
 });
 
 serverApplication.get("/region", (req, res) => {
   console.log("sending the crime data for region!");
   res.send("this will send region data");
+});
+
+serverApplication.get("/sub-region", (req, res) => {
+  console.log("sending the crime data for sub-region!");
+  res.send("this will send sub-region data");
+});
+
+serverApplication.get("/state", (req, res) => {
+  console.log("sending the crime data for state!");
+  res.send("this will send state data");
 });
 
 //Server will listen on port 443
