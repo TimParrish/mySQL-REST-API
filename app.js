@@ -15,9 +15,9 @@ serverApplication.get("/test", (req, res) => {
 
   const databaseConnection = mysql.createConnection({
     host: "localhost",
-    user: "api",
-    password: "password",
-    database: "timstest",
+    user: "parrish",
+    password: "password121419",
+    database: "parrish",
     insecureAuth: true
   });
 
@@ -49,7 +49,7 @@ serverApplication.get("/state", (req, res) => {
   res.send("this will send state data");
 });
 
-//Server will listen on port 443
-serverApplication.listen(443, () => {
-  console.log("Server initialized and listening on port 443!!!");
+//Server will listen on port 8080
+serverApplication.listen(8080, () => {
+  console.log("Server initialized and listening on port 8080!!!");
 });
