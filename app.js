@@ -10,8 +10,9 @@ serverApplication.get("/", (req, res) => {
   res.send("Use a more specific route");
 });
 
-serverApplication.get("/test", (req, res) => {
-  console.log("get test from database");
+//get data for a given state by year
+serverApplication.get("/state/:stateName/:dataYear", (req, res) => {
+  console.log("get state test from database");
 
   const databaseConnection = mysql.createConnection({
     host: "localhost",
@@ -20,11 +21,12 @@ serverApplication.get("/test", (req, res) => {
     database: "parrish",
     insecureAuth: true
   });
+  const stateName = req.params.stateName;
+  const dataYear = req.params.dataYear;
+  const selectStateQuery = "select * from STATE where State_name = ? and Data_for_year = ?";
 
-  const testQuery = "select * from people";
-
-  databaseConnection.query(testQuery, (err, rows, fields) => {
-    console.log("test retrieved???");
+  databaseConnection.query(selectStateQuery, [stateName, dataYear], (err, rows, fields) => {
+    console.log("State data was retrieved!!!");
     res.json(rows);
 
     if (err) {
@@ -42,6 +44,35 @@ serverApplication.get("/region", (req, res) => {
 serverApplication.get("/sub-region", (req, res) => {
   console.log("sending the crime data for sub-region!");
   res.send("this will send sub-region data");
+});
+
+serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
+  console.log("sending the violent crime data for state!");
+  //res.send("this will send violent crime data for a given state and year");
+
+  const databaseConnection = mysql.createConnection({
+    host: "localhost",
+    user: "parrish",
+    password: "password121419",
+    database: "parrish",
+    insecureAuth: true
+  });
+
+  const state = req.params.stateName;
+  const crime = req.params.crime;
+  const year = req.params.dataYear;
+
+  const violentCrimeQuery = "select ? FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE where State_name = ? and Data_for_year = ?) and Data_for_year = ?";
+
+  databaseConnection.query(violentCrimeQuery, [crime, state, year, year], (err, rows, fields) => {
+    console.log("Violent crime data for a given state and year was retrieved!!!");
+    res.json(rows);
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+  });
 });
 
 serverApplication.get("/state", (req, res) => {
