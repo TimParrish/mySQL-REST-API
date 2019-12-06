@@ -11,10 +11,44 @@ serverApplication.get("/", (req, res) => {
 });
 
 //get data for a given state by year
-serverApplication.get("/state/:stateName/:dataYear", (req, res) => {
+serverApplication.get("/state/:stateName/:crime/:dataYear", (req, res) => {
   console.log("get state test from database");
 
   const databaseConnection = mysql.createConnection({
+    host: "localhost",
+    user: "parrish",
+    password: "password121419",
+    database: "parrish",
+    insecureAuth: true
+  });
+  const stateName = req.params.stateName;
+  const dataYear = req.params.dataYear;
+  const crime = req.params.crime;
+  //const selectStateQuery = "select * from STATE where State_name = ? and Data_for_year = ? and  crime = ?";
+  const selectStateQuery = `SELECT ${crime} FROM STATE INNER JOIN VIOLENT_CRIME ON STATE.State_id = VIOLENT_CRIME.State_id AND STATE.Data_for_year = VIOLENT_CRIME.Data_for_year WHERE State_name = '${stateName}' and STATE.Data_for_year = ${dataYear}`;
+
+  console.log("\n\n" + selectStateQuery + "\n\n");
+
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log("State data was retrieved!!!");
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+
+    });
+});;
+
+// TODO
+// get crime data by region
+serverApplication.get("/region/:regionName/", (req, res) => {
+  console.log("sending the crime data for region!");
+  res.send("this will send region data");
+
+/*  const databaseConnection = mysql.createConnection({
     host: "localhost",
     user: "parrish",
     password: "password121419",
@@ -33,12 +67,7 @@ serverApplication.get("/state/:stateName/:dataYear", (req, res) => {
       console.log("database error: " + err);
       res.sendStatus(500);
     }
-  });
-});
-
-serverApplication.get("/region", (req, res) => {
-  console.log("sending the crime data for region!");
-  res.send("this will send region data");
+  });*/
 });
 
 serverApplication.get("/sub-region", (req, res) => {
@@ -48,7 +77,6 @@ serverApplication.get("/sub-region", (req, res) => {
 
 serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
   console.log("sending the violent crime data for state!");
-  //res.send("this will send violent crime data for a given state and year");
 
   const databaseConnection = mysql.createConnection({
     host: "localhost",
@@ -62,9 +90,14 @@ serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
   const crime = req.params.crime;
   const year = req.params.dataYear;
 
-  const violentCrimeQuery = "select ? FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE where State_name = ? and Data_for_year = ?) and Data_for_year = ?";
+  const violentCrimeQuery = `select ${crime} FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE WHERE State_name = '${state}' and Data_for_year = ${year}) and Data_for_year = ${year}`;
 
-  databaseConnection.query(violentCrimeQuery, [crime, state, year, year], (err, rows, fields) => {
+  console.log("\n\n" + violentCrimeQuery + "\n\n");
+
+  //const violentCrimeQuery = "select Murder_manslaughter FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE where State_name = 'Montana' and Data_for_year = 2016) and Data_for_year = 2016";
+
+  //databaseConnection.query(violentCrimeQuery, [crime, state, year, year], (err, rows, fields) => {
+  databaseConnection.query(violentCrimeQuery, (err, rows, fields) => {
     console.log("Violent crime data for a given state and year was retrieved!!!");
     res.json(rows);
 
@@ -74,6 +107,7 @@ serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
     }
   });
 });
+
 
 serverApplication.get("/state", (req, res) => {
   console.log("sending the crime data for state!");
