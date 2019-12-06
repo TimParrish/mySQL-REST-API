@@ -5,7 +5,7 @@ const cors = require("cors");
 serverApplication.use(cors());
 
 //get VIOLENT crime data for a given state by year
-serverApplication.get("/violent/:stateName/:crime/:dataYear", (req, res) => {
+serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
   console.log("get state test from database");
 
   const databaseConnection = mysql.createConnection({
@@ -37,7 +37,7 @@ serverApplication.get("/violent/:stateName/:crime/:dataYear", (req, res) => {
 
 //get NON-VIOLENT crime data for a given state by year
 serverApplication.get(
-  "/non-violent/:stateName/:crime/:dataYear",
+  "/non-violent/:crime/:stateName/:dataYear",
   (req, res) => {
     console.log("get state test from database");
 
