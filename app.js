@@ -4,17 +4,18 @@ const mysql = require("mysql");
 const cors = require("cors");
 serverApplication.use(cors());
 
+const databaseConnection = mysql.createConnection({
+  host: "localhost",
+  user: "parrish",
+  password: "password121419",
+  database: "parrish",
+  insecureAuth: true
+});
+
 //get VIOLENT crime data for a given state by year
 serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
   console.log("get state test from database");
 
-  const databaseConnection = mysql.createConnection({
-    host: "localhost",
-    user: "parrish",
-    password: "password121419",
-    database: "parrish",
-    insecureAuth: true
-  });
   const stateName = req.params.stateName;
   const dataYear = req.params.dataYear;
   const crime = req.params.crime;
@@ -41,13 +42,6 @@ serverApplication.get(
   (req, res) => {
     console.log("get state test from database");
 
-    const databaseConnection = mysql.createConnection({
-      host: "localhost",
-      user: "parrish",
-      password: "password121419",
-      database: "parrish",
-      insecureAuth: true
-    });
     const stateName = req.params.stateName;
     const dataYear = req.params.dataYear;
     const crime = req.params.crime;
@@ -73,13 +67,6 @@ serverApplication.get(
 serverApplication.get("/maxData/:crime/:year", (req, res) => {
   console.log("Get state with most roberies");
 
-  const databaseConnection = mysql.createConnection({
-    host: "localhost",
-    user: "parrish",
-    password: "password121419",
-    database: "parrish",
-    insecureAuth: true
-  });
   const crime = req.params.crime;
   const year = req.params.year;
 
@@ -103,13 +90,6 @@ serverApplication.get("/maxData/:crime/:year", (req, res) => {
 serverApplication.get("/minData/:crime/:year", (req, res) => {
   console.log("Get state with fewest roberies");
 
-  const databaseConnection = mysql.createConnection({
-    host: "localhost",
-    user: "parrish",
-    password: "password121419",
-    database: "parrish",
-    insecureAuth: true
-  });
   const crime = req.params.crime;
   const year = req.params.year;
 
@@ -164,14 +144,6 @@ serverApplication.get("/sub-region", (req, res) => {
 
 // serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
 //   console.log("sending the violent crime data for state!");
-
-//   const databaseConnection = mysql.createConnection({
-//     host: "localhost",
-//     user: "parrish",
-//     password: "password121419",
-//     database: "parrish",
-//     insecureAuth: true
-//   });
 
 //   const state = req.params.stateName;
 //   const crime = req.params.crime;
