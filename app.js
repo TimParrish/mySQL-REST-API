@@ -5,13 +5,8 @@ const cors = require("cors");
 
 serverApplication.use(cors());
 
-serverApplication.get("/", (req, res) => {
-  console.log("Hit the root route");
-  res.send("Use a more specific route");
-});
-
-//get data for a given state by year
-serverApplication.get("/state/:stateName/:crime/:dataYear", (req, res) => {
+//get VIOLENT crime data for a given state by year
+serverApplication.get("/violent/:stateName/:crime/:dataYear", (req, res) => {
   console.log("get state test from database");
 
   const databaseConnection = mysql.createConnection({
@@ -38,9 +33,70 @@ serverApplication.get("/state/:stateName/:crime/:dataYear", (req, res) => {
     }
 
     return res.json(rows);
+  });
+});
 
-    });
-});;
+// Get MAX data for a given crime in a given year
+serverApplication.get("/maxData/:crime/:year", (req, res) => {
+  console.log("Get state with most roberies");
+
+  const databaseConnection = mysql.createConnection({
+    host: "localhost",
+    user: "parrish",
+    password: "password121419",
+    database: "parrish",
+    insecureAuth: true
+  });
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectState2Query = `SELECT State_name FROM STATE WHERE State_id = (SELECT State_id FROM VIOLENT_CRIME WHERE '${crime}' = (SELECT MAX('${crime}') FROM VIOLENT_CRIME WHERE Data_for_year = ${year})  AND Data_for_year = ${year} LIMIT 1)`;
+
+  console.log("\n\n" + selectState2Query + "\n\n");
+
+  databaseConnection.query(selectState2Query, (err, rows, fields) => {
+    console.log("State2 data was retrieved!");
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+
+  });
+});
+
+// Get MIN data for a given crime in a given year
+serverApplication.get("/minData/:crime/:year", (req, res) => {
+  console.log("Get state with fewest roberies");
+
+  const databaseConnection = mysql.createConnection({
+    host: "localhost",
+    user: "parrish",
+    password: "password121419",
+    database: "parrish",
+    insecureAuth: true
+  });
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectState2Query = `SELECT State_name FROM STATE WHERE State_id = (SELECT State_id FROM VIOLENT_CRIME WHERE '${crime}' = (SELECT MIN('${crime}') FROM VIOLENT_CRIME) AND Data_for_year = ${year})  LIMIT 1)`;
+
+  console.log("\n\n" + selectState2Query + "\n\n");
+
+  databaseConnection.query(selectState2Query, (err, rows, fields) => {
+    console.log("State2 data was retrieved!");
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+
+  });
+});
 
 // TODO
 // get crime data by region
