@@ -1,21 +1,39 @@
 # mySQL-REST-API
 
-Simple RESTful API for mySQL database
+Simple RESTful API for mySQL database. This was the first full-stack application and it was designed with the parameters for CSCI440: Databases at MSU. [The front-end built with ReactJS](https://github.com/TimParrish/database-front-end-web-app) uses the Axios package to make the HTTP requests back to this code using the ExpressJS server, mySQL and some supporting packages. The design lends itself to the project that I was assigned with the given constraints, future full-stack applications I build without the design constraints will look much different.
 
-From the root directory of this project
-`npm install`
+The dataset used for this full-stack application was the [FBI Crime Statistics for 2015 and 2016](https://ucr.fbi.gov/crime-in-the-u.s/2016/crime-in-the-u.s.-2016/tables/table-2/table-2.xls#overview) with some expanded random data to meet the parameters of the assignment. 
 
-Once the project is installed, start the server:
-`node app.js`
+Note: to install and start this API endpoint, a mySQL database with the approprite permissions and user accounts must be configured on the server first. The database credentials can be added to the databaseConnection variable near the top of the app.js file.
 
-If updates are made to app.js, the server will need to be stopped and restarted with
-`node app.js`
+From the root directory of this project: `npm install`
 
-TODO: create strings that will server as sql queries and take variables from the front end.
+Once the project is installed, start the server: `node app.js`
 
-select \* from STATES where statename="montana" AND crime = "larceny"
-select ? from STATES where statename= ? AND crime = ?
+If updates are made to app.js, the server will need to be stopped and then restarted with `node app.js`
 
-let whatToPick
-let stateName
-let crimeType
+To test if the server is up and running (reguardless of if mySQL is hooked in yet), you can navigate to the default route of the web server of `127.0.0.1:443/` where the ip address this is running on is localhost. You should see a message appear in your web browser confirming the server is up and running. `Default route hit, the server is up an running`
+
+This REST API has the following endpoints when linked with an appropiate database:
+
+* `/nationalAggregateTotal/:year`
+* `/violent/:crime/:stateName/:dataYear`
+* `/non-violent/:crime/:stateName/:dataYear`
+* `/violentMaxData/:crime/:year`
+* `/violentMinData/:crime/:year`
+* `/nonViolentMaxData/:crime/:year`
+* `/nonViolentMinData/:crime/:year`
+* Default route `/` 
+
+For the given data set:
+
+Violent crimes:
+* Murder_manslaughter
+* Aggrevated_assult
+* Robery
+* Rape
+
+Non-violent crimes:
+* Burglary
+* Larceny_theft
+* Motor_vehicle_theft
