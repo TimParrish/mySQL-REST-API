@@ -4,28 +4,29 @@ const mysql = require("mysql");
 const cors = require("cors");
 serverApplication.use(cors());
 
+let portNumber = 443;
+
 const databaseConnection = mysql.createConnection({
   host: "localhost",
-  user: "parrish",
-  password: "password121419",
-  database: "parrish",
+  user: "databaseUserName",
+  password: "password",
+  database: "databaseName",
   insecureAuth: true
 });
 
+
 //get VIOLENT crime data for a given state by year
 serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
-  console.log("get state test from database");
-
   const stateName = req.params.stateName;
   const dataYear = req.params.dataYear;
   const crime = req.params.crime;
-  //const selectStateQuery = "select * from STATE where State_name = ? and Data_for_year = ? and  crime = ?";
-  const selectStateQuery = `SELECT ${crime} FROM STATE INNER JOIN VIOLENT_CRIME ON STATE.State_id = VIOLENT_CRIME.State_id AND STATE.Data_for_year = VIOLENT_CRIME.Data_for_year WHERE State_name = '${stateName}' and STATE.Data_for_year = ${dataYear}`;
 
-  console.log("\n\n" + selectStateQuery + "\n\n");
+  const selectStateQuery = `SELECT ${crime} FROM STATE INNER JOIN VIOLENT_CRIME ON 
+  STATE.State_id = VIOLENT_CRIME.State_id AND STATE.Data_for_year = VIOLENT_CRIME.Data_for_year 
+  WHERE State_name = '${stateName}' and STATE.Data_for_year = ${dataYear}`;
 
   databaseConnection.query(selectStateQuery, (err, rows, fields) => {
-    console.log("State data was retrieved!!!");
+    console.log(`VIOLENT crime data for ${crime} in ${stateName}:${dataYear} was retrieved`);
 
     if (err) {
       console.log("database error: " + err);
@@ -36,22 +37,22 @@ serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
   });
 }); //END: get VIOLENT crime data for a given state by year
 
+
 //get NON-VIOLENT crime data for a given state by year
 serverApplication.get(
   "/non-violent/:crime/:stateName/:dataYear",
   (req, res) => {
-    console.log("get state test from database");
-
     const stateName = req.params.stateName;
     const dataYear = req.params.dataYear;
     const crime = req.params.crime;
 
-    const selectStateQuery = `SELECT ${crime} FROM STATE INNER JOIN NON_VIOLENT_CRIME ON STATE.State_id = NON_VIOLENT_CRIME.State_id AND STATE.Data_for_year = NON_VIOLENT_CRIME.Data_for_year WHERE State_name = '${stateName}' and STATE.Data_for_year = ${dataYear}`;
-
-    console.log("\n" + selectStateQuery + "\n");
+    const selectStateQuery = `SELECT ${crime} FROM STATE INNER JOIN 
+    NON_VIOLENT_CRIME ON STATE.State_id = NON_VIOLENT_CRIME.State_id AND 
+    STATE.Data_for_year = NON_VIOLENT_CRIME.Data_for_year WHERE 
+    State_name = '${stateName}' and STATE.Data_for_year = ${dataYear}`;
 
     databaseConnection.query(selectStateQuery, (err, rows, fields) => {
-      console.log("State data was retrieved!!!");
+      console.log(`NON-VIOLENT crime data for ${crime} in ${stateName}:${dataYear} was retrieved`);
 
       if (err) {
         console.log("database error: " + err);
@@ -63,111 +64,128 @@ serverApplication.get(
   }
 ); //END: get NON-VIOLENT crime data for a given state by year
 
-// Get MAX data for a given crime in a given year
-serverApplication.get("/maxData/:crime/:year", (req, res) => {
-  console.log("Get state with most roberies");
-
-  const crime = req.params.crime;
-  const year = req.params.year;
-
-  const selectState2Query = `SELECT State_name FROM STATE WHERE State_id = (SELECT State_id FROM VIOLENT_CRIME WHERE '${crime}' = (SELECT MAX('${crime}') FROM VIOLENT_CRIME WHERE Data_for_year = ${year})  AND Data_for_year = ${year} LIMIT 1)`;
-
-  console.log("\n\n" + selectState2Query + "\n\n");
-
-  databaseConnection.query(selectState2Query, (err, rows, fields) => {
-    console.log("State2 data was retrieved!");
-
-    if (err) {
-      console.log("database error: " + err);
-      res.sendStatus(500);
-    }
-
-    return res.json(rows);
-  });
-}); // END: Get MAX data for a given crime in a given year
-
-// Get MIN data for a given crime in a given year
-serverApplication.get("/minData/:crime/:year", (req, res) => {
-  console.log("Get state with fewest roberies");
-
-  const crime = req.params.crime;
-  const year = req.params.year;
-
-  const selectState2Query = `SELECT State_name FROM STATE WHERE State_id = (SELECT State_id FROM VIOLENT_CRIME WHERE '${crime}' = (SELECT MIN('${crime}') FROM VIOLENT_CRIME) AND Data_for_year = ${year})  LIMIT 1)`;
-
-  console.log("\n\n" + selectState2Query + "\n\n");
-
-  databaseConnection.query(selectState2Query, (err, rows, fields) => {
-    console.log("State2 data was retrieved!");
-
-    if (err) {
-      console.log("database error: " + err);
-      res.sendStatus(500);
-    }
-
-    return res.json(rows);
-  });
-}); // END: Get MIN data for a given crime in a given year
 
 // See aggregate national totals by year
 serverApplication.get("/nationalAggregateTotal/:year", (req, res) => {
-  console.log("sending the aggregate national crime totals!");
+  const year = req.params.year;
 
-  //TODO: remove next line after query written
-  res.send("this will send aggregate national data");
+  const selectStateQuery = `SELECT SUM(burglary) AS Burglary_total,SUM(larceny_theft) 
+  AS larceny_theft_total,SUM(motor_vehicle_theft) AS motor_vehicle_theft_total, 
+  SUM(murder_manslaughter) AS murder_manslaughter_total,Sum(aggrevated_assult) 
+  AS aggrevated_assult_total, sum(robery) AS robery_total,sum(rape) 
+  AS rape_total FROM NON_VIOLENT_CRIME INNER JOIN VIOLENT_CRIME ON 
+  NON_VIOLENT_CRIME.State_id = VIOLENT_CRIME.State_id where 
+  VIOLENT_CRIME.data_for_year = ${year} AND NON_VIOLENT_CRIME.data_for_year = ${year};`
 
-  //const dataYear = req.params.year;
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log(`Aggregate State data for ${year} was retrieved!`);
 
-  //TODO: MAKE A VALID QUERY TO SHOW ALL TOTALS NATIONALY AND RETURN DATA
-  // const selectStateQuery =
-  //   "select * from STATE where State_name = ? and Data_for_year = ?";
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
 
-  // databaseConnection.query(
-  //   selectStateQuery,
-  //   [stateName, dataYear],
-  //   (err, rows, fields) => {
-  //     console.log("State data was retrieved!!!");
-  //     res.json(rows);
+    return res.json(rows);
+  });
+});// End Aggregate State Data
 
-  //     if (err) {
-  //       console.log("database error: " + err);
-  //       res.sendStatus(500);
-  //     }
-  //   }
-  // );
-}); // END: See aggregate national totals by year
 
-serverApplication.get("/sub-region", (req, res) => {
-  console.log("sending the crime data for sub-region!");
-  res.send("this will send sub-region data");
+// Get VIOLENT crime MAX data for a given crime in a given year
+serverApplication.get("/violentMaxData/:crime/:year", (req, res) => {
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectStateQuery = `SELECT State_name FROM STATE INNER JOIN VIOLENT_CRIME ON 
+    STATE.State_id = VIOLENT_CRIME.State_id WHERE ${crime} = (SELECT MAX(${crime}) 
+    FROM VIOLENT_CRIME) AND STATE.Data_for_year = ${year};`
+
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log(`The state with the highest number of ${crime} for the year ${year} was retrieved!`);
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+  });
+}); // END: Get MAX data for a given VIOLENT crime in a given year
+
+
+// Get VIOLENT crime MIN data for a given crime in a given year
+serverApplication.get("/violentMinData/:crime/:year", (req, res) => {
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectStateQuery = `SELECT State_name FROM STATE INNER JOIN VIOLENT_CRIME ON 
+    STATE.State_id = VIOLENT_CRIME.State_id WHERE ${crime} = (SELECT MIN(${crime}) 
+    FROM VIOLENT_CRIME) AND STATE.Data_for_year = ${year};`
+
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log(`The state with the lowest number of ${crime} for the year ${year} was retrieved!`);
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+  });
+}); // END: Get MIN data for a given VIOLENT crime in a given year
+
+
+// Get non-violent crime MAX data for a given crime in a given year
+serverApplication.get("/nonViolentMaxData/:crime/:year", (req, res) => {
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectStateQuery = `SELECT State_name FROM STATE INNER JOIN NON_VIOLENT_CRIME ON 
+    STATE.State_id = NON_VIOLENT_CRIME.State_id WHERE ${crime} = (SELECT MAX(${crime}) 
+    FROM NON_VIOLENT_CRIME) AND STATE.Data_for_year = ${year};`
+
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log(`The state with the highest number of ${crime} for the year ${year} was retrieved!`);
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+  });
+}); // END: Get MAX data for a given violent crime in a given year
+
+
+// Get non-violent crime MIN data for a given crime in a given year
+serverApplication.get("/nonViolentMinData/:crime/:year", (req, res) => {
+  const crime = req.params.crime;
+  const year = req.params.year;
+
+  const selectStateQuery = `SELECT State_name FROM STATE INNER JOIN NON_VIOLENT_CRIME ON 
+    STATE.State_id = NON_VIOLENT_CRIME.State_id WHERE ${crime} = (SELECT MIN(${crime}) 
+    FROM NON_VIOLENT_CRIME) AND STATE.Data_for_year = ${year};`
+
+  databaseConnection.query(selectStateQuery, (err, rows, fields) => {
+    console.log(`The state with the lowest number of ${crime} for the year ${year} was retrieved!`);
+
+    if (err) {
+      console.log("database error: " + err);
+      res.sendStatus(500);
+    }
+
+    return res.json(rows);
+  });
+}); // END: Get MIN data for a given non-violent crime in a given year
+
+
+// Create a default route with a response for testing
+serverApplication.get("/", (req, res) => {
+  console.log("Default route, server is up and running!");
+  res.send("Default route hit, the server is up an running");
 });
 
-// serverApplication.get("/violent/:crime/:stateName/:dataYear", (req, res) => {
-//   console.log("sending the violent crime data for state!");
 
-//   const state = req.params.stateName;
-//   const crime = req.params.crime;
-//   const year = req.params.dataYear;
-
-//   const violentCrimeQuery = `select ${crime} FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE WHERE State_name = '${state}' and Data_for_year = ${year}) and Data_for_year = ${year}`;
-
-//   console.log("\n\n" + violentCrimeQuery + "\n\n");
-
-//   //const violentCrimeQuery = "select Murder_manslaughter FROM VIOLENT_CRIME WHERE State_id = ( Select State_id from STATE where State_name = 'Montana' and Data_for_year = 2016) and Data_for_year = 2016";
-
-//   //databaseConnection.query(violentCrimeQuery, [crime, state, year, year], (err, rows, fields) => {
-//   databaseConnection.query(violentCrimeQuery, (err, rows, fields) => {
-//     console.log("Violent crime data for a given state and year was retrieved!!!");
-//     res.json(rows);
-
-//     if (err) {
-//       console.log("database error: " + err);
-//       res.sendStatus(500);
-//     }
-//   });
-// });
-
-//Server will listen on port 8080
-serverApplication.listen(8080, () => {
-  console.log("Server initialized and listening on port 8080!!!");
+// Initialize the server and listen on portNumber
+serverApplication.listen(portNumber, () => {
+  console.log("Server initialized and listening on port " + portNumber + "!");
 });
