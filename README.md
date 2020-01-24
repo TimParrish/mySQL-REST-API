@@ -1,4 +1,4 @@
-# mySQL-REST-API
+# mySQL-REST-API for full-stack application
 
 Simple RESTful API for mySQL database. This was the first full-stack application and it was designed with the parameters for CSCI440: Databases at MSU. [The front-end built with ReactJS](https://github.com/TimParrish/database-front-end-web-app) uses the Axios package to make the HTTP requests back to this code using the ExpressJS server, mySQL and some supporting packages. The design lends itself to the project that I was assigned with the given constraints, future full-stack applications I build without the design constraints will look much different.
 
